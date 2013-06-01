@@ -3,21 +3,20 @@ $(function() {
    // center world map
     var map = L.map('map').setView([10, 116.00150299], 2);
     console.log(map);
-  L.tileLayer('http://{s}.tile.cloudmade.com/' + keys.cloudmade + '/97745/256/{z}/{x}/{y}.png', {
-    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
-    maxZoom: 13
-}).addTo(map);
-$( "#slider" ).slider({
-	    range: true,
-	    min: 1921,
-	    max: 1949,
-	    values: [ 1930, 1940 ],
-	    slide: function( event, ui ) {
-		console.log(event,ui);
-		//$( "#amount" ).val( "$" + ui.values[ 0 ] + " - $" + ui.values[ 1 ] );
-	    }
-	});
+    L.tileLayer('http://{s}.tile.cloudmade.com/' + keys.cloudmade + '/97745/256/{z}/{x}/{y}.png', {
+    	attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
+    	maxZoom: 13
+    }).addTo(map);
+	// create slider
+	for (var y = 1921; y < 1950; y++){
+		$('#fromYear').append("<option value='" + y + "'>" + y  + "</option>");	
+		$('#toYear').append("<option value='" + y + "'>" + y  + "</option>");	
+	}
+	$('#fromYear').val(1930);
+	$('#toYear').val(1940);
 
+	$('select#fromYear, select#toYear').selectToUISlider();
+				
 });
 
 //var lat = jQuery(el).data('lat');
