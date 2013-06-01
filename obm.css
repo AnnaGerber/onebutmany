@@ -19,7 +19,20 @@ ul {
 .navbar-inverse .nav .active > a, .navbar-inverse .nav .active > a:hover, .navbar-inverse .nav .active > a:focus {
 	background-color:#1F202E;
 }
-
+.nav {
+	left:0;
+	padding-left:0;
+	margin-left:0;
+}
+.content {
+	padding-top:20px;
+}
+blockquote p {
+	font-size:15px;
+}
+small {
+	font-size:11px;
+}
 #slider {
 	position: fixed;
 	right:20px;
