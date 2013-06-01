@@ -1,0 +1,4 @@
+var keys = {
+    cloudmade: "",
+    trove: ""
+};
