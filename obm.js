@@ -1,4 +1,7 @@
 $(function() {
+	if (!console && !console.log) {
+		console = {log:function(){}}
+	}
 var map;
    // center world map
 
@@ -27,7 +30,6 @@ function setupSlider(){
 	$('select#fromYear, select#toYear').selectToUISlider();	
 }
 function setupTimeSeriesChart(){
-	console.log("time series chart")
 	var time = new Rickshaw.Fixtures.Time();
 	var years = time.unit('years');
 	
@@ -35,10 +37,8 @@ function setupTimeSeriesChart(){
 
 	for (var i = 0; i < graphseries.length; i++){
 		var s = graphseries[i];
-		console.log(palette.color())
 		s.color = palette.color()
 	}
-	console.log(graphseries)
 	var graph = new Rickshaw.Graph( {
 		renderer: 'area',
         element: document.querySelector("#chart"),
@@ -112,7 +112,6 @@ function setupTimeSeriesChart(){
 }
 function loadMapData(){
 	map = L.map('map').setView([10, 116.00150299], 2);
-	console.log("map is",map);
 	L.tileLayer('http://{s}.tile.cloudmade.com/' + keys.cloudmade + '/97745/256/{z}/{x}/{y}.png', {
 		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
 		maxZoom: 13
@@ -122,9 +121,8 @@ function loadMapData(){
 		success: function(d){
 
 			var embarkation = d.embarkation;
-						console.log("got data",d)
 			for (i in d.embarkation){
-				console.log(i)
+				
 				var result = d.embarkation[i];
 				if (result[0] != ""  && result[1]){
 					var latlng = result[1].split(",");
