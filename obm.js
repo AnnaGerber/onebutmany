@@ -25,8 +25,8 @@ function setupSlider(){
 		$('#fromYear').append("<option value='" + y + "'>" + y  + "</option>");	
 		$('#toYear').append("<option value='" + y + "'>" + y  + "</option>");	
 	}
-	$('#fromYear').val(1930);
-	$('#toYear').val(1940);
+	$('#fromYear').val(1921);
+	$('#toYear').val(1949);
 
 	$('select#fromYear, select#toYear').selectToUISlider();	
 	$( "#slider" ).on( "slidestop", function( event, ui ) {
