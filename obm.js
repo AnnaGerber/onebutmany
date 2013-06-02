@@ -65,15 +65,15 @@ function setupTimeSeriesChart(){
 
 	var format = function(n) {
 
-		var map = {
-			1947: 'Oct 1945-Jun 1947',
-			1948: '1947–48',
-			1949: '1948–49',
-			1950: '1949–50',
+		var mapping = {
+			1947: '_____45-47',
+			1948: '47–48',
+			1949: '48–49',
+			1950: '49–50_____',
 			
 		};
 
-		return map[n];
+		return mapping[n];
 	}
 
 	var x_ticks = new Rickshaw.Graph.Axis.X( {
@@ -104,7 +104,8 @@ function setupTimeSeriesChart(){
 		xFormatter: function(x) { return "Year: " + x },
 		yFormatter: function(y) { return Math.floor(y) + " people" }
 	} );
-	/*var highlighter = new Rickshaw.Graph.Behavior.Series.Highlight({
+	/* Not really that useful with such a large dataset
+	var highlighter = new Rickshaw.Graph.Behavior.Series.Highlight({
 		graph: graph,
 		legend: legend
 	});*/
