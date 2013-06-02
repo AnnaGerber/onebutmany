@@ -2,7 +2,8 @@ $(function() {
 	if (!console && !console.log) {
 		console = {log:function(){}}
 	}
-var map;
+var map, markers;
+var markerArray = [];
    // center world map
 
     if ($('#map').length > 0){
@@ -28,6 +29,14 @@ function setupSlider(){
 	$('#toYear').val(1940);
 
 	$('select#fromYear, select#toYear').selectToUISlider();	
+	$( "#slider" ).on( "slidestop", function( event, ui ) {
+		
+		var values = ui.values;
+		var startYear = values[0] + 1921;
+		var endYear = values[1] + 1921;
+		console.log("slider stopped " + startYear  + " " + endYear)
+		updateDisplay({startYear: startYear, endYear: endYear});
+	} );
 }
 function setupTimeSeriesChart(){
 	var time = new Rickshaw.Fixtures.Time();
@@ -112,31 +121,73 @@ function setupTimeSeriesChart(){
 }
 function loadMapData(){
 	map = L.map('map').setView([10, 116.00150299], 2);
+	markerArray = [];
 	L.tileLayer('http://{s}.tile.cloudmade.com/' + keys.cloudmade + '/97745/256/{z}/{x}/{y}.png', {
 		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
 		maxZoom: 13
 	}).addTo(map);
-	$.ajax({
-		url: 'api/getgeodata.php',
-		success: function(d){
+    markers = new L.MarkerClusterGroup();
 
-			var embarkation = d.embarkation;
-			for (i in d.embarkation){
+	var params = {startYear: 1921, endYear: 1949};
+	//var startYear = $('#slider').
+	updateDisplay(params);
+
+}
+function updateDisplay(params) {
+	var planeMarker = L.AwesomeMarkers.icon({
+		icon: 'plane', 
+		color: 'darkblue'
+	});
+	var shipMarker = L.AwesomeMarkers.icon({
+		icon: 'anchor', 
+		color: 'darkpurple'
+	});
+	for (var i = 0; i < markerArray.length; i++){
+		map.removeLayer(markerArray[i]);
+	}
+	console.log("all markers",markers)
+		$.ajax({
+		url: 'api/getpassengercounts.php',
+		data: params,
+		success: function(d){
+			
+			for (i in d.arrivalcounts){
 				
-				var result = d.embarkation[i];
-				if (result[0] != ""  && result[1]){
-					var latlng = result[1].split(",");
-					if (latlng && latlng.length == 2){
-					
-						var marker = L.marker(latlng).addTo(map)
-						$(marker).data('country',result[0])
-						.on("click", function(e){console.log("you clicked",e)})
+				var result = d.arrivalcounts[i];
+				console.log(result);
+				var port = result[1];
+				$.ajax({
+					url: 'api/getgeodata.php',
+					data: {place:port},
+					success: function(gd){
+						var data = gd.embarkation;
+						for (var i = 0; i < data.length; i++){
+							var result = data[i];
+							if (result[0] != ""  && result[1]){
+								var latlng = result[1].split(",");
+								if (latlng && latlng.length == 2){
+									var marker = L.marker(latlng, {icon: shipMarker}).addTo(map);
+									markers.addLayer(marker);
+									markerArray.push(marker);
+									$(marker).data('port',result[1])
+									.data('passengers', result[0])
+									.on("click", popupInfo)
+								}
+							}
+						}
 					}
-				}
+						
+				})
+				
+
 			}
 		}
 	})
-
+}
+function popupInfo(e){
+	console.log("marker clicked")
+	$('#slider').hide();
+	$('#myModal').modal('show').on('hide',function(){$('#slider').show()});
 }
 //var lat = jQuery(el).data('lat');
 //var long = jQuery(el).data('long');
