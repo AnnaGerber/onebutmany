@@ -1,14 +1,9 @@
 $(function() {
-
+var map;
    // center world map
 
     if ($('#map').length > 0){
-    	var map = L.map('map').setView([10, 116.00150299], 2);
-    	console.log(map);
-    	L.tileLayer('http://{s}.tile.cloudmade.com/' + keys.cloudmade + '/97745/256/{z}/{x}/{y}.png', {
-    		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
-    		maxZoom: 13
-    	}).addTo(map);
+    	
     	loadMapData();
     }
 
@@ -116,12 +111,34 @@ function setupTimeSeriesChart(){
 	graph.render();
 }
 function loadMapData(){
+	map = L.map('map').setView([10, 116.00150299], 2);
+	console.log("map is",map);
+	L.tileLayer('http://{s}.tile.cloudmade.com/' + keys.cloudmade + '/97745/256/{z}/{x}/{y}.png', {
+		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
+		maxZoom: 13
+	}).addTo(map);
 	$.ajax({
-		url: 'getdata.php',
+		url: 'api/getgeodata.php',
 		success: function(d){
-			console.log("got data",d)
+
+			var embarkation = d.embarkation;
+						console.log("got data",d)
+			for (i in d.embarkation){
+				console.log(i)
+				var result = d.embarkation[i];
+				if (result[0] != ""  && result[1]){
+					var latlng = result[1].split(",");
+					if (latlng && latlng.length == 2){
+					
+						var marker = L.marker(latlng).addTo(map)
+						$(marker).data('country',result[0])
+						.on("click", function(e){console.log("you clicked",e)})
+					}
+				}
+			}
 		}
 	})
+
 }
 //var lat = jQuery(el).data('lat');
 //var long = jQuery(el).data('long');
