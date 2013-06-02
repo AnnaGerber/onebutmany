@@ -54,3 +54,32 @@ label, select {
 	left: 0;
 	/*bottom: 0;*/
 }
+
+/* Rickshaw */
+#chart_container {
+	position: relative;
+	font-family: Arial, Helvetica, sans-serif;
+}
+#chart {
+	position: relative;
+	left: 40px;
+}
+.rickshaw_graph .y_ticks {
+	left: 0;
+}
+#y_axis {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	width: 40px;
+}
+#legend {
+	background-color: #1F202E;
+	max-height:400px;
+	overflow:auto;
+	width: 210px;
+}
+.rickshaw_legend .action {
+	color:#F2DD7B;
+	opacity: .8 !important;
+}
