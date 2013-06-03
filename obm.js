@@ -2,7 +2,7 @@ $(function() {
 	if (!console && !console.log) {
 		console = {log:function(){}}
 	}
-var map, markers;
+var map, markers, slider;
 var markerArray = [];
    // center world map
 
@@ -25,16 +25,16 @@ function setupSlider(){
 		$('#fromYear').append("<option value='" + y + "'>" + y  + "</option>");	
 		$('#toYear').append("<option value='" + y + "'>" + y  + "</option>");	
 	}
-	$('#fromYear').val(1921);
+	$('#fromYear').val(1938);
 	$('#toYear').val(1949);
 
-	$('select#fromYear, select#toYear').selectToUISlider();	
+	slider = $('select#fromYear, select#toYear').selectToUISlider();	
 	$( "#slider" ).on( "slidestop", function( event, ui ) {
 		
 		var values = ui.values;
 		var startYear = values[0] + 1921;
 		var endYear = values[1] + 1921;
-		console.log("slider stopped " + startYear  + " " + endYear)
+		//console.log("slider stopped " + startYear  + " " + endYear)
 		updateDisplay({startYear: startYear, endYear: endYear});
 	} );
 }
@@ -53,16 +53,6 @@ function setupTimeSeriesChart(){
         element: document.querySelector("#chart"),
         width: 600,
         height: 400,
-        /*series: [ {
-        	    name: "Fiji",
-                 data: [ { x: 1947, y: 282 }, { x: 1948, y: 296 }, { x: 1949, y: 190 }, { x: 1950, y: 180 }],
-                 color: palette.color()
-        },
-        {
-                        name: "New Zealand",
-                        data: [ { x: 1947, y: 3903 }, { x: 1948, y: 2622},{ x: 1949, y: 2998 }, { x: 1950, y: 3542 }],
-	color: palette.color()
-		}*/
 		series: graphseries
          
     } );
@@ -145,54 +135,66 @@ function updateDisplay(params) {
 	for (var i = 0; i < markerArray.length; i++){
 		map.removeLayer(markerArray[i]);
 	}
-	console.log("all markers",markers)
-		$.ajax({
+	
+	$.ajax({
 		url: 'api/getpassengercounts.php',
 		data: params,
 		success: function(d){
 			
-			for (i in d.arrivalcounts){
+			$.each(d.arrivalcounts, function(item, index){
 				
-				var result = d.arrivalcounts[i];
-				console.log(result);
-				var port = result[1];
+				var arrivalresult = d.arrivalcounts[item];
+				
+				var port = arrivalresult[1];
+				var passengercount = arrivalresult[0];
+		
 				$.ajax({
 					url: 'api/getgeodata.php',
-					data: {place:port},
+					data: {place: port},
 					success: function(gd){
 						var data = gd.embarkation;
+						// in case of null data
 						for (var i = 0; i < data.length; i++){
 							var result = data[i];
 							if (result[0] != ""  && result[1]){
+								var port = result[0];
 								var latlng = result[1].split(",");
 								if (latlng && latlng.length == 2){
-									var marker = L.marker(latlng, {icon: shipMarker}).addTo(map);
+									var marker = L.marker(latlng, {icon: shipMarker})
+									.addTo(map);
+
+									$(marker)
+									  .data('port', port)
+									  .data('passengers', passengercount)
+									  .on("click", popupInfo)
+									  .on('mouseover', function(e2){
+										
+										this.bindPopup(
+											$(this).data('port') 
+											+ "(" + $(this).data('passengers') + " passengers)"
+										).openPopup();
+									});
 									markers.addLayer(marker);
 									markerArray.push(marker);
-									$(marker).data('port',result[1])
-									.data('passengers', result[0])
-									.on("click", popupInfo)
 								}
 							}
 						}
 					}
 						
-				})
-				
+				});
 
-			}
+			});
 		}
 	})
 }
 function popupInfo(e){
-	console.log("marker clicked")
+	
 	$('#slider').hide();
+	var port = $(e.currentTarget).data('port');
+	var fromYear = $(slider[0]).val();
+	var toYear = $(slider[1]).val();
+	// showModal(port,fromYear,toYear);
+
+	// temporary dummy display for demo
 	$('#myModal').modal('show').on('hide',function(){$('#slider').show()});
 }
-//var lat = jQuery(el).data('lat');
-//var long = jQuery(el).data('long');
-//var map = L.map(el).setView([lat, long], 6);
-//var marker = L.marker([lat, long]).addTo(map);
-//var mapquestUrl = 'http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png',
-//subDomains = ['otile1','otile2','otile3','otile4']; 
-//var mapquest = L.tileLayer(mapquestUrl, {maxZoom: 18, subdomains: subDomains}).addTo(map);
