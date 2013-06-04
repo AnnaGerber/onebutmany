@@ -171,7 +171,7 @@ function updateDisplay(params) {
 										
 										this.bindPopup(
 											$(this).data('port') 
-											+ "(" + $(this).data('passengers') + " passengers)"
+											+ " (" + $(this).data('passengers') + " passengers)"
 										).openPopup();
 									});
 									markers.addLayer(marker);
